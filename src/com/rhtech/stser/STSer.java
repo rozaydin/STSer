@@ -11,31 +11,36 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 
-
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class STSer extends AnAction
 {
-    final String path = "C:\\STS\\sts.txt";
+    final String STS_CONFIG_NAME = "sts.txt";
+    final String STS_CONFIG_DIR = "STS";
 
     enum TOKEN
     {
         AWS_ACCESS_KEY_ID,
         AWS_SECRET_ACCESS_KEY,
-        AWS_SECURITY_TOKEN
+        AWS_SECURITY_TOKEN,
+        AWS_SESSION_TOKEN
     }
 
-    private Map<TOKEN, String> parseFile()
+    private Optional<Map<TOKEN, String>> parseFile()
     {
 
-        File configFile = new File(path);
+        String homeDirectory = System.getProperty("user.home");
+        Path path = Paths.get(homeDirectory, STS_CONFIG_DIR, STS_CONFIG_NAME);
+
+        File configFile = path.toFile();
         Map<TOKEN, String> AWS_ENV_VARS = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(configFile)))
@@ -53,49 +58,56 @@ public class STSer extends AnAction
                 if (searchExpIndex != -1)
                 {
                     AWS_ENV_VARS.put(currToken, line.substring(searchExpIndex + searchExpression.length()));
-                    if ( (++tokenSearchIndex) >= TOKEN.values().length ) {
+                    if ((++tokenSearchIndex) >= TOKEN.values().length)
+                    {
                         break;
                     }
                 }
             }
 
+            // if collected token count is less than expected
+            if (AWS_ENV_VARS.size() < TOKEN.values().length)
+            {
+                throw new Exception("AWS Environment variables are missing (expected 4 but found less)");
+            }
+
         }
-        catch (FileNotFoundException exc)
+        catch (Exception exc)
         {
-            System.out.println(exc);
-        }
-        catch (IOException exc)
-        {
-            System.out.println(exc);
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                Notifications.Bus.notify(new Notification("STSer", "STS Parsing Error ", "Unable to Parse STS token file exc: " + exc.getMessage(),
+                        NotificationType.ERROR));
+            });
         }
 
         // AWS_ENV_VARS
-        return AWS_ENV_VARS;
+        return AWS_ENV_VARS.size() == TOKEN.values().length ? Optional.of(AWS_ENV_VARS) : Optional.empty();
     }
 
     @Override
     public void actionPerformed(AnActionEvent e)
     {
 
-        Map<TOKEN, String> awsTokens = parseFile();
-        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        parseFile().ifPresent((awsTokens) -> {
 
-        Arrays.stream(openProjects).forEach((project) -> {
-            RunManager runManager = RunManager.getInstance(ProjectManager.getInstance().getOpenProjects()[0]);
-            if (runManager.getSelectedConfiguration() != null) {
-                ApplicationConfiguration config = (ApplicationConfiguration) runManager.getSelectedConfiguration().getConfiguration();
-                awsTokens.entrySet().stream().forEach((entry) -> {
-                    config.getEnvs().put(entry.getKey().name(), entry.getValue());
-                });
-                // display notification
-                // display notification
-                ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Notifications.Bus.notify(new Notification("STSer", "Run Configuration " + config.getName() + " updated", "STS variables set to env variables", NotificationType.INFORMATION));
-                    }
-                });
-            }
+            Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+
+            Arrays.stream(openProjects).forEach((project) -> {
+                RunManager runManager = RunManager.getInstance(ProjectManager.getInstance().getOpenProjects()[0]);
+                if (runManager.getSelectedConfiguration() != null)
+                {
+                    ApplicationConfiguration config = (ApplicationConfiguration) runManager.getSelectedConfiguration().getConfiguration();
+                    awsTokens.entrySet().stream().forEach((entry) -> {
+                        config.getEnvs().put(entry.getKey().name(), entry.getValue());
+                    });
+                    // display notification
+                    ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                        Notifications.Bus.notify(new Notification("STSer", "Run Configuration " + config.getName() + " updated",
+                                "STS variables set to env variables", NotificationType.INFORMATION));
+                    });
+
+                }
+            });
         });
     }
 }
