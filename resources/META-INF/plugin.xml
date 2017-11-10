@@ -1,17 +1,16 @@
 <idea-plugin>
-  <id>com.your.company.unique.plugin.id</id>
-  <name>Plugin display name here</name>
+  <id>com.rhtech.stser</id>
+  <name>STSer</name>
   <version>1.0</version>
   <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      <h1>STSer</h1>
+      <h5>Reads STS configuration from downloaded STS config and sets in to intellij</h5>
     ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      Initial Release
     ]]>
   </change-notes>
 
@@ -30,7 +29,7 @@
 
   <actions>
     <!-- Add your actions here -->
-    <action id="STSer" class="com.rhtech.stser.STSer" text="STSer" description="STSer Plugin Configuration">
+    <action id="STSer" class="com.rhtech.stser.STSer" text="STSer" description="STSer Plugin Configuration" icon="/icons/action_icon.png">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
   </actions>
