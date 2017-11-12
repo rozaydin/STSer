@@ -25,6 +25,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
+    <applicationService serviceInterface="com.rhtech.stser.STSConfigService" serviceImplementation="com.rhtech.stser.STSConfigService"/>
   </extensions>
 
   <actions>
@@ -34,4 +35,9 @@
     </action>
   </actions>
 
+    <application-components>
+        <component>
+            <implementation-class>com.rhtech.stser.STSApp</implementation-class>
+        </component>
+    </application-components>
 </idea-plugin>
