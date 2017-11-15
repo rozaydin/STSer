@@ -29,11 +29,11 @@ import java.util.regex.Pattern;
 
 public class STSConfigService
 {
-    final Pattern configPattern = Pattern.compile("sts(\\([0-9]+\\))*.txt");
-    final String STS_CONFIG_DIR = "STS";
+    final Pattern configPattern = Pattern.compile("sts\\s*(\\([0-9]+\\))*.txt");
+    // final String STS_CONFIG_DIR = "STS";
+    final String STS_CONFIG_DIR = "Downloads";
     final Path stsDirectory;
 
-    //
     private volatile String mostRecentSTSConfigFile;
 
     public STSConfigService()

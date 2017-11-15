@@ -2,15 +2,17 @@
   <id>com.rhtech.stser</id>
   <name>STSer</name>
   <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <vendor email="ridvanozaydin@gmail.com" url="https://github.com/rozaydin/STSer">Rıdvan Özaydın</vendor>
 
   <description><![CDATA[
       <h1>STSer</h1>
-      <h5>Reads STS configuration from downloaded STS config and sets in to intellij</h5>
+      <h5>Reads STS configuration from downloaded STS config (default location is ${user.home}/Downloads) and sets in to active intellij run configuration</h5>
     ]]></description>
 
   <change-notes><![CDATA[
       Initial Release
+      1. Supports manual AWS env var setup (Tools->STSer)
+      2. Supports automatic AWS env var setup (listens ${user.home}/Donwloads and when a new sts.txt file put reflects changes to active intellij run configuration)
     ]]>
   </change-notes>
 
