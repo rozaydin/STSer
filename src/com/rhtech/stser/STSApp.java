@@ -14,10 +14,10 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class STSApp implements ApplicationComponent
 {
-
     private WatchService watcher;
     private WatchKey watchKey;
     private volatile boolean listening = true;
+    private Thread watcherThread;
 
     @Override
     public void initComponent()
@@ -29,12 +29,15 @@ public class STSApp implements ApplicationComponent
             // Watcher events
             watchKey = stsConfigService.getSTSDirectory().register(watcher, ENTRY_CREATE, ENTRY_MODIFY);
             // register listener
-            ForkJoinPool.commonPool().execute(() -> {
+            watcherThread = new Thread(() -> {
                 while (listening)
                 {
                     stsConfigService.listenForChanges(watcher);
                 }
             });
+            // set deamon
+            watcherThread.setDaemon(true);
+            watcherThread.start();
         }
         catch (Exception exc)
         {

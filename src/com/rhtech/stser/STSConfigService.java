@@ -71,7 +71,7 @@ public class STSConfigService
         }
     }
 
-    public void processFile(String fileName)
+    private void processFile(String fileName)
     {
 
         parseFile(fileName).ifPresent((awsTokens) -> {
@@ -176,7 +176,7 @@ public class STSConfigService
         return stsDirectory;
     }
 
-    public void listenForChanges(WatchService watchService)
+    void listenForChanges(WatchService watchService)
     {
 
         WatchKey watchKey = watchService.poll();
