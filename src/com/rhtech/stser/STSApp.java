@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.file.FileSystems;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.concurrent.ForkJoinPool;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -17,7 +16,6 @@ public class STSApp implements ApplicationComponent
     private WatchService watcher;
     private WatchKey watchKey;
     private volatile boolean listening = true;
-    private Thread watcherThread;
 
     @Override
     public void initComponent()
@@ -29,13 +27,13 @@ public class STSApp implements ApplicationComponent
             // Watcher events
             watchKey = stsConfigService.getSTSDirectory().register(watcher, ENTRY_CREATE, ENTRY_MODIFY);
             // register listener
-            watcherThread = new Thread(() -> {
+            Thread watcherThread = new Thread(() -> {
                 while (listening)
                 {
                     stsConfigService.listenForChanges(watcher);
                 }
             });
-            // set deamon
+
             watcherThread.setDaemon(true);
             watcherThread.start();
         }
@@ -52,6 +50,7 @@ public class STSApp implements ApplicationComponent
         {
             listening = false;
             watcher.close();
+            watchKey.cancel();
         }
         catch (Exception exc)
         {

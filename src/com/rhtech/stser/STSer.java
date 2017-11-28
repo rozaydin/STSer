@@ -13,8 +13,7 @@ public class STSer extends AnAction
         STSConfigService stsConfigService = ServiceManager.getService(STSConfigService.class);
         stsConfigService.processFile();
 
-        STSSettingsDialog dialog = new STSSettingsDialog(e.getProject(), true);
-        dialog.show();
-
+        // STSSettingsDialog dialog = new STSSettingsDialog(e.getProject(), true);
+        // dialog.show();
     }
 }

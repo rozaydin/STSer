@@ -12,3 +12,6 @@ Plugin searches STS config file under ${user.home}/Downloads/sts.txt path user.h
 
 Application and SpringBootApplication run configurations are supported
 
+## v1.1
+Fixed a bug that caused freezes on the IDE.
+

@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.rhtech.stser</id>
   <name>STSer</name>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor email="ridvanozaydin@gmail.com" url="https://github.com/rozaydin/STSer">Rıdvan Özaydın</vendor>
 
   <description><![CDATA[
@@ -10,9 +10,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      Initial Release
-      1. Supports manual AWS env var setup (Tools->STSer)
-      2. Supports automatic AWS env var setup (listens ${user.home}/Donwloads and when a new sts.txt file put reflects changes to active intellij run configuration)
+      Fixed a critical bug where plugin caused ide freezes, Performance improvements and code cleanup
     ]]>
   </change-notes>
 
